@@ -1,0 +1,17 @@
+build/
+
+.vs/
+.idea/
+
+CMakeUserPresets.json
+
+*.obj
+*.o
+*.pdb
+*.ilk
+*.exe
+*.dll
+*.lib
+
+*.tmp
+*.log
