@@ -4,8 +4,6 @@
 #include <cmath>
 #include <iostream>
 
-// keep all defintions in header file, since these methods will be called a lot
-
 class vec3 {
   public:
     std::array<float, 3> e{0.0f, 0.0f, 0.0f};

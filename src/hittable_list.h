@@ -18,7 +18,7 @@ class hittable_list : public hittable {
     void add(std::shared_ptr<hittable> object) {
         objects.push_back(object);
     }
-    
+
     /**
      * Goes through all objects in the list to find which one the ray hits first.
      * If a hit, it stores the info about the closest hit in rec.
