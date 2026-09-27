@@ -13,8 +13,3 @@ constexpr float pi = std::numbers::pi_v<float>;
 inline float degrees_to_radians(float degrees) {
     return degrees * pi / 180.0f;
 }
-
-// Common Headers
-#include "color.h"
-#include "ray.h"
-#include "vec3.h"

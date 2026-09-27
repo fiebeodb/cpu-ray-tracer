@@ -1,8 +1,11 @@
+#include "common.h"
+#include "color.h"
 #include "hittable.h"
 #include "hittable_list.h"
+#include "ray.h"
 #include "sphere.h"
+#include "vec3.h"
 
-#include "common.h"
 #include <fstream>
 
 // a point P is on sphere (center C, radius r) surface if:  (P-C)^2 = r^2
