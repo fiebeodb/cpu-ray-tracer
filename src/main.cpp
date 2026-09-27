@@ -5,6 +5,7 @@
 #include "ray.h"
 #include "sphere.h"
 #include "vec3.h"
+#include "interval.h"
 
 #include <fstream>
 
@@ -26,7 +27,7 @@ float hit_sphere(const point3& center, float radius, const ray& r) {
 
 color ray_color(const ray& r, const hittable& world) {
     hit_record rec;
-    if (world.hit(r, 0.0f, infinity, rec)) {
+    if (world.hit(r, interval(0, infinity), rec)) {
         return 0.5f * (rec.normal + color(1.0f, 1.0f, 1.0f));
     }
     vec3 unit_direction = unit_vector(r.direction());

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ray.h"
+#include "interval.h"
 
 class hit_record {
   public:
@@ -31,11 +32,10 @@ class hittable {
      * Checks if the given ray intersects with this object (within a specific t range)
      * 
      * @param r the ray
-     * @param ray_tmin The closest distance allowed for a hit
-     * @param ray_tmax The furthest distance allowed for a hit
+     * @param ray_t the interval in which ray hitpoints are considered
      * @param rec Where the hit information is stored (if hit)
      * 
      * @return true if the ray hits the object, else false
      */
-    virtual bool hit(const ray& r, float ray_tmin, float ray_tmax, hit_record& rec) const = 0;
+    virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
 };

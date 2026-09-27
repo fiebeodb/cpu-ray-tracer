@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <utility>
+#include "interval.h"
 
 
 class hittable_list : public hittable {
@@ -24,20 +25,19 @@ class hittable_list : public hittable {
      * If a hit, it stores the info about the closest hit in rec.
      * 
      * @param r The casted ray
-     * @param ray_tmin The closest distance allowed for a hit
-     * @param ray_tmax The furthest distance allowed for a hit
+     * @param ray_t the interval in which ray hitpoints are considered
      * @param rec Where the hit (closest) information is stored
      * 
      * @return true if the ray hits any object in the list, else false
      */
-    bool hit(const ray& r, float ray_tmin, float ray_tmax, hit_record& rec) const override {
+    bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
         hit_record temp_rec;
         bool hit_anything = false;
-        auto closest_so_far = ray_tmax;
+        auto closest_so_far = ray_t.max;
 
         for (const auto& object : objects) {
             // call the object's hit function (will put hitpoint info in temp_rec)
-            if (object->hit(r, ray_tmin, closest_so_far, temp_rec)) {
+            if (object->hit(r, interval(ray_t.min, closest_so_far), temp_rec)) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
                 rec = temp_rec;
