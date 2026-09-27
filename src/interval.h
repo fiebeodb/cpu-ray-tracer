@@ -9,18 +9,24 @@ class interval {
 
     constexpr interval() : min {+infinity}, max{-infinity} {} // Default interval is empty
 
-    interval(double min, double max) : min(min), max(max) {}
+    interval(float min, float max) : min{min}, max{max} {}
 
-    constexpr double size() const {
+    constexpr float size() const {
         return max - min;
     }
 
-    constexpr bool contains(double x) const {
+    constexpr bool contains(float x) const {
         return min <= x && x <= max;
     }
 
-    constexpr bool surrounds(double x) const {
+    constexpr bool surrounds(float x) const {
         return min < x && x < max;
+    }
+
+    float clamp(float x) const {
+        if (x < min) return min;
+        if (x > max) return max;
+        return x;
     }
 
     static const interval empty;
