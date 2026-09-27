@@ -2,6 +2,7 @@
 #include "ray.h"
 #include "vec3.h"
 
+#include <fstream>
 #include <iostream>
 
 // a point P is on sphere (center C, radius r) surface if:  (P-C)^2 = r^2
@@ -9,14 +10,14 @@
 // of the form  at^2 + bt + c = r^2  determining if the ray hits or not:
 float hit_sphere(const point3& center, float radius, const ray& r) {
     vec3 oc = center - r.origin();
-    auto a = dot(r.direction(), r.direction());
-    auto b = -2.0 * dot(r.direction(), oc);
-    auto c = dot(oc, oc) - radius*radius;
-    auto discriminant = b*b - 4*a*c;
-    if (discriminant < 0) {
-        return -1.0;
+    auto a = r.direction().length_squared();
+    auto h = dot(r.direction(), oc);
+    auto c = oc.length_squared() - radius*radius;
+    auto discriminant = h*h - a*c;
+    if (discriminant < 0.0f) {
+        return -1.0f;
     } else {
-        return (-b - std::sqrt(discriminant) ) / (2.0*a);
+        return (h - std::sqrt(discriminant)) / a;
     }
 }
 
@@ -54,8 +55,8 @@ int main() {
     constexpr auto viewport_upper_left = camera_center - vec3(0, 0, focal_length) - viewport_u/2 - viewport_v/2;
     constexpr auto pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
-
-    std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
+    std::ofstream out("image.ppm", std::ios::out | std::ios::binary);
+    out << "P3\n" << image_width << " " << image_height << "\n255\n";
 
     for (int j = 0; j < image_height; j++) {
         for (int i = 0; i < image_width; i++) {
@@ -64,7 +65,7 @@ int main() {
             ray r(camera_center, ray_direction);
 
             color pixel_color = ray_color(r);
-            write_color(std::cout, pixel_color);
+            write_color(out, pixel_color);
         }
     }
 }
