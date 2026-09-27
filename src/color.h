@@ -5,6 +5,13 @@
 
 using color = vec3;
 
+/**
+* Converts a float color (0.0-1.0) into RGB values (0 to 255)
+* and writes it to the given output stream.
+* 
+* @param out The stream  to write the color data to
+* @param pixel_color The color of the pixel
+*/
 void write_color(std::ostream& out, const color& pixel_color) {
     auto r = pixel_color.x();
     auto g = pixel_color.y();
@@ -16,3 +23,5 @@ void write_color(std::ostream& out, const color& pixel_color) {
 
     out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }
+
+
