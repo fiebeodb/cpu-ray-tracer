@@ -4,7 +4,8 @@ void camera::render(const hittable& world) {
     initialize();
 
     std::ofstream out("image.ppm", std::ios::out | std::ios::binary);
-    out << "P3\n" << image_width << " " << image_height << "\n255\n";
+    // P6: raw bytes
+    out << "P6\n" << image_width << " " << image_height << "\n255\n";   
 
     for (int j = 0; j < image_height; j++) {
         for (int i = 0; i < image_width; i++) {
@@ -60,24 +61,25 @@ vec3 camera::sample_square() const {
 }
 
 color camera::ray_color(const ray& r, int depth, const hittable& world) const {
-    color throughput(1.0f, 1.0f, 1.0f);
+    color through(1.0f, 1.0f, 1.0f);
     color accumulated(0.0f, 0.0f, 0.0f);
-    ray cur_ray = r;
-    
+    ray current_ray = r;
+
     // If we've exceeded the ray bounce limit, no more light is gathered.
-    for (int bounce = 0; bounce < max_depth; ++bounce) {
+    for (int bounce = 0; bounce < depth; ++bounce) {
         hit_record rec;
         // 0.004 instead of 0 to get rid of shadow acne (due to floating point errors)
-        if (world.hit(cur_ray, interval(0.004f, infinity), rec)) {
+        if (world.hit(current_ray, interval(0.004f, infinity), rec)) {
             vec3 direction = rec.normal + random_unit_vector();
-            cur_ray = ray(rec.p, direction);
-            throughput *= 0.6f;
+            current_ray = ray(rec.p, direction);
+            through *= 0.6f;
         } else { // background
-            vec3 unit_direction = unit_vector(cur_ray.direction());
+            vec3 unit_direction = unit_vector(current_ray.direction());
             auto a = 0.5f * (unit_direction.y() + 1.0f);
             color sky = (1.0f - a) * color(1.0f, 1.0f, 1.0f) + a * color(0.4f, 0.6f, 1.0f);
-            accumulated += throughput * sky;
+            accumulated += through * sky;
             break;
         }
     }
+    return accumulated;
 }

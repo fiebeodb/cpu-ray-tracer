@@ -11,7 +11,7 @@ class camera {
     float aspect_ratio = 1.0f;
     int image_width  = 100;  // Rendered image width in pixel count
     int samples_per_pixel = 10;
-    int max_depth = 10; // Max number of ray bounces into scene
+    int max_depth = 10; // Max number of ray bounces in scene -> make it lower for games!
 
     void render(const hittable& world);
 
