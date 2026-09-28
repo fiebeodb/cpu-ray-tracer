@@ -12,12 +12,12 @@ class hittable_list : public hittable {
     std::vector<std::shared_ptr<hittable>> objects;
 
     hittable_list() = default;
-    hittable_list(std::shared_ptr<hittable> object) { add(std::move(object)); }
+    explicit hittable_list(std::shared_ptr<hittable> object) { add(std::move(object)); }
 
     void clear() { objects.clear(); }
 
     void add(std::shared_ptr<hittable> object) {
-        objects.push_back(object);
+        objects.push_back(std::move(object));
     }
 
     /**
@@ -27,7 +27,6 @@ class hittable_list : public hittable {
      * @param r The casted ray
      * @param ray_t the interval in which ray hitpoints are considered
      * @param rec Where the hit (closest) information is stored
-     * 
      * @return true if the ray hits any object in the list, else false
      */
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {

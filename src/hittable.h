@@ -34,7 +34,6 @@ class hittable {
      * @param r the ray
      * @param ray_t the interval in which ray hitpoints are considered
      * @param rec Where the hit information is stored (if hit)
-     * 
      * @return true if the ray hits the object, else false
      */
     virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;

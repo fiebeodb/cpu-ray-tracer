@@ -6,7 +6,7 @@
 
 class camera {
   public:
-    double aspect_ratio = 1.0;
+    float aspect_ratio = 1.0;
     int image_width  = 100;  // Rendered image width in pixel count
     int samples_per_pixel = 10;
 
@@ -67,7 +67,6 @@ class camera {
      * 
      * @param i The horizontal pixel index
      * @param j The vertical pixel index
-     * 
      * @return the constructed ray
      */
     ray get_ray(int i, int j) const {
@@ -89,13 +88,21 @@ class camera {
         return vec3(random_float() - 0.5f, random_float() - 0.5f, 0.0f);
     }
 
-    color ray_color(const ray& r, const hittable& world) {
+    /**
+     * Computes the color for a given ray depending on what/if it intersects
+     * 
+     * @param r The ray cast from the camera through a specific pixel.
+     * @param world The collection of all hittable objects in the scene
+     * @return The computed RGB color (with components from 0.0f to 1.0f).
+     */
+    color ray_color(const ray& r, const hittable& world) const {
         hit_record rec;
 
         if (world.hit(r, interval(0, infinity), rec)) {
-            return 0.5f * (rec.normal + color(1.0f,1.0f,1.0f));
+            return 0.5f * (rec.normal + color(1.0f,1.0f,1.0f)); // from [-1,1] to [0,1]
         }
 
+        // background
         vec3 unit_direction = unit_vector(r.direction());
         auto a = 0.5f*(unit_direction.y() + 1.0f);
         return (1.0f-a)*color(1.0f, 1.0f, 1.0f) + a*color(0.5f, 0.7f, 1.0f);
