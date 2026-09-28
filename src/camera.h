@@ -106,7 +106,7 @@ class camera {
         // 0.001 instead of 0 to get rid of shadow acne (due to floating point errors)
         if (world.hit(r, interval(0.001f, infinity), rec)) {
             vec3 direction = rec.normal + random_unit_vector();
-            return 0.5f * ray_color(ray(rec.p, direction), depth - 1, world);
+            return 0.6f * ray_color(ray(rec.p, direction), depth - 1, world);
         }
 
         // background
