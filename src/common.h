@@ -16,9 +16,15 @@ inline float degrees_to_radians(float degrees) {
 }
 
 inline float random_float() {
-    thread_local static std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
-    thread_local static std::mt19937 generator{std::random_device{}()};
-    return distribution(generator);
+    thread_local static uint32_t state = 123456789 ^ std::random_device{}();
+    
+    // fast Xorshift32 algorithm
+    state ^= state << 13;
+    state ^= state >> 17;
+    state ^= state << 5;
+    
+    // Multiply by (1.0 / 2^32) to map the random uint32 to a float between 0.0 and 1.0
+    return state * 2.3283064365386963e-10f; 
 }
 
 inline float random_float(float min, float max) {

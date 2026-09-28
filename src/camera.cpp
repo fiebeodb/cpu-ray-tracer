@@ -60,20 +60,24 @@ vec3 camera::sample_square() const {
 }
 
 color camera::ray_color(const ray& r, int depth, const hittable& world) const {
-    // If we've exceeded the ray bounce limit, no more light is gathered.
-    if (depth <= 0)
-        return color(0.0f,0.0f,0.0f);
+    color throughput(1.0f, 1.0f, 1.0f);
+    color accumulated(0.0f, 0.0f, 0.0f);
+    ray cur_ray = r;
     
-    hit_record rec;
-
-    // 0.001 instead of 0 to get rid of shadow acne (due to floating point errors)
-    if (world.hit(r, interval(0.001f, infinity), rec)) {
-        vec3 direction = rec.normal + random_unit_vector();
-        return 0.6f * ray_color(ray(rec.p, direction), depth - 1, world);
+    // If we've exceeded the ray bounce limit, no more light is gathered.
+    for (int bounce = 0; bounce < max_depth; ++bounce) {
+        hit_record rec;
+        // 0.004 instead of 0 to get rid of shadow acne (due to floating point errors)
+        if (world.hit(cur_ray, interval(0.004f, infinity), rec)) {
+            vec3 direction = rec.normal + random_unit_vector();
+            cur_ray = ray(rec.p, direction);
+            throughput *= 0.6f;
+        } else { // background
+            vec3 unit_direction = unit_vector(cur_ray.direction());
+            auto a = 0.5f * (unit_direction.y() + 1.0f);
+            color sky = (1.0f - a) * color(1.0f, 1.0f, 1.0f) + a * color(0.4f, 0.6f, 1.0f);
+            accumulated += throughput * sky;
+            break;
+        }
     }
-
-    // background
-    vec3 unit_direction = unit_vector(r.direction());
-    auto a = 0.5f*(unit_direction.y() + 1.0f); // from [-1,1] to [0,1]
-    return (1.0f-a)*color(1.0f, 1.0f, 1.0f) + a*color(0.4f, 0.6f, 1.0f);
 }
