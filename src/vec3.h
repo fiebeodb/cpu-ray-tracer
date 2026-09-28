@@ -44,6 +44,14 @@ class vec3 {
     constexpr float length_squared() const {
         return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
     }
+
+    static vec3 random() {
+        return vec3(random_float(), random_float(), random_float());
+    }
+
+    static vec3 random(float min, float max) {
+        return vec3(random_float(min,max), random_float(min,max), random_float(min,max));
+    }
 };
 
 using point3 = vec3;
@@ -93,4 +101,35 @@ constexpr inline vec3 cross(const vec3& u, const vec3& v) {
 
 constexpr inline vec3 unit_vector(const vec3& v) {
     return v / v.length();
+}
+
+/**
+ * Generates random vectors within a 2x2 unit square, until we find one that
+ * falls within the radius 1 circle in this square, then return it normalized.
+ * 
+ * @return the random normalized vector
+ */
+inline vec3 random_unit_vector() {
+    while (true) {
+        auto p = vec3::random(-1,1);
+        auto lensq = p.length_squared();
+        // norm will be 0 if all 3 coords small enough: reject
+        if (1e-160 < lensq && lensq <= 1)
+            return p / sqrt(lensq);
+    }
+}
+
+/**
+ * Generates random vector in the correct hemisphere (= same as the normal).
+ * If the randomly generated vector isn't, it is inverted so it now is.
+ * 
+ * @param normal The normal vector for a (hit)point on the object's surface
+ * @return The randomly generated vector
+ */
+inline vec3 random_on_hemisphere(const vec3& normal) {
+    vec3 on_unit_sphere = random_unit_vector();
+    if (dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+        return on_unit_sphere;
+    else
+        return -on_unit_sphere;
 }
