@@ -6,7 +6,7 @@
 
 class camera {
   public:
-    float aspect_ratio = 1.0;
+    float aspect_ratio = 1.0f;
     int image_width  = 100;  // Rendered image width in pixel count
     int samples_per_pixel = 10;
     int max_depth = 10; // Max number of ray bounces into scene
@@ -19,7 +19,7 @@ class camera {
 
         for (int j = 0; j < image_height; j++) {
             for (int i = 0; i < image_width; i++) {
-                color pixel_color(0,0,0);
+                color pixel_color(0.0f,0.0f,0.0f);
                 for (int sample = 0; sample < samples_per_pixel; sample++) {
                     ray r = get_ray(i, j);
                     pixel_color += ray_color(r, max_depth, world);
@@ -103,9 +103,10 @@ class camera {
         
         hit_record rec;
 
-        if (world.hit(r, interval(0, infinity), rec)) {
-            vec3 direction = random_on_hemisphere(rec.normal);
-            return 0.5 * ray_color(ray(rec.p, direction), depth-1, world);
+        // 0.001 instead of 0 to get rid of shadow acne (due to floating point errors)
+        if (world.hit(r, interval(0.001f, infinity), rec)) {
+            vec3 direction = rec.normal + random_unit_vector();
+            return 0.5f * ray_color(ray(rec.p, direction), depth - 1, world);
         }
 
         // background
