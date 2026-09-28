@@ -105,7 +105,7 @@ constexpr inline vec3 unit_vector(const vec3& v) {
 
 /**
  * Generates random vectors within a 2x2 unit square, until we find one that
- * falls within the radius 1 circle in this square, then return it normalized.
+ * falls within the unit 1 circle in this square, then return it normalized.
  * 
  * @return the random normalized vector
  */

@@ -9,6 +9,7 @@ class camera {
     float aspect_ratio = 1.0;
     int image_width  = 100;  // Rendered image width in pixel count
     int samples_per_pixel = 10;
+    int max_depth = 10; // Max number of ray bounces into scene
 
     void render(const hittable& world) {
         initialize();
@@ -21,7 +22,7 @@ class camera {
                 color pixel_color(0,0,0);
                 for (int sample = 0; sample < samples_per_pixel; sample++) {
                     ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, max_depth, world);
                 }
                 write_color(out, pixel_samples_scale * pixel_color);
             }
@@ -95,16 +96,21 @@ class camera {
      * @param world The collection of all hittable objects in the scene
      * @return The computed RGB color (with components from 0.0f to 1.0f).
      */
-    color ray_color(const ray& r, const hittable& world) const {
+    color ray_color(const ray& r, int depth, const hittable& world) const {
+        // If we've exceeded the ray bounce limit, no more light is gathered.
+        if (depth <= 0)
+            return color(0.0f,0.0f,0.0f);
+        
         hit_record rec;
 
         if (world.hit(r, interval(0, infinity), rec)) {
-            return 0.5f * (rec.normal + color(1.0f,1.0f,1.0f)); // from [-1,1] to [0,1]
+            vec3 direction = random_on_hemisphere(rec.normal);
+            return 0.5 * ray_color(ray(rec.p, direction), depth-1, world);
         }
 
         // background
         vec3 unit_direction = unit_vector(r.direction());
-        auto a = 0.5f*(unit_direction.y() + 1.0f);
+        auto a = 0.5f*(unit_direction.y() + 1.0f); // from [-1,1] to [0,1]
         return (1.0f-a)*color(1.0f, 1.0f, 1.0f) + a*color(0.5f, 0.7f, 1.0f);
     }
 };
