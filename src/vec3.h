@@ -111,10 +111,10 @@ constexpr inline vec3 unit_vector(const vec3& v) {
  */
 inline vec3 random_unit_vector() {
     while (true) {
-        auto p = vec3::random(-1,1);
+        auto p = vec3::random(-1.0f,1.0f);
         auto lensq = p.length_squared();
         // norm will be 0 if all 3 coords small enough: reject
-        if (1e-160 < lensq && lensq <= 1)
+        if (1e-7f < lensq && lensq <= 1.0f)
             return p / sqrt(lensq);
     }
 }

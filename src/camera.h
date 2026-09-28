@@ -112,6 +112,6 @@ class camera {
         // background
         vec3 unit_direction = unit_vector(r.direction());
         auto a = 0.5f*(unit_direction.y() + 1.0f); // from [-1,1] to [0,1]
-        return (1.0f-a)*color(1.0f, 1.0f, 1.0f) + a*color(0.5f, 0.7f, 1.0f);
+        return (1.0f-a)*color(1.0f, 1.0f, 1.0f) + a*color(0.4f, 0.6f, 1.0f);
     }
 };
