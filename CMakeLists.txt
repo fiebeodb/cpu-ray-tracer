@@ -11,4 +11,7 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-add_executable(raytracer src/main.cpp)
+add_executable(raytracer 
+    src/main.cpp 
+    src/camera.cpp
+)

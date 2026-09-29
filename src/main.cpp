@@ -7,6 +7,7 @@ int main() {
     hittable_list world;
 
     world.add(std::make_shared<sphere>(point3(0.0f, 0.0f, -1.0f), 0.5f));
+    world.add(std::make_shared<sphere>(point3(1.0f, 0.08f, -1.0f), 0.5f));
     world.add(std::make_shared<sphere>(point3(0.0f, -100.5f, -1.0f), 100.0f));
 
     camera cam;

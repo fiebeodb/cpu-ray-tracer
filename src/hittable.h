@@ -2,11 +2,15 @@
 
 #include "ray.h"
 #include "interval.h"
+#include <memory>
+
+class material;
 
 class hit_record {
   public:
     point3 p; // the ray-hittable hitpoint
     vec3 normal;
+    shared_ptr<material> mat; // pointer to the material of the hit object
     float t;
     bool front_face; // true-false if ray comes from outside-inside the object
 
