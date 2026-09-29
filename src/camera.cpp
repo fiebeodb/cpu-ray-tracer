@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "material.h"
 
 void camera::render(const hittable& world) {
     initialize();
@@ -70,9 +71,15 @@ color camera::ray_color(const ray& r, int depth, const hittable& world) const {
         hit_record rec;
         // 0.004 instead of 0 to get rid of shadow acne (due to floating point errors)
         if (world.hit(current_ray, interval(0.004f, infinity), rec)) {
-            vec3 direction = rec.normal + random_unit_vector();
-            current_ray = ray(rec.p, direction);
-            through *= 0.6f;
+            ray scattered;
+            color attenuation;
+            if (rec.mat->scatter(current_ray, rec, attenuation, scattered)) {
+                current_ray = scattered;
+                through *= attenuation;
+            } else {
+                // Ray was completely absorbed by the material
+                break; 
+            }
         } else { // background
             vec3 unit_direction = unit_vector(current_ray.direction());
             auto a = 0.5f * (unit_direction.y() + 1.0f);

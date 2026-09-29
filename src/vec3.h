@@ -33,6 +33,13 @@ class vec3 {
         return *this;
     }
 
+    constexpr vec3& operator*=(const vec3& v) {
+        e[0] *= v.e[0];
+        e[1] *= v.e[1];
+        e[2] *= v.e[2];
+        return *this;
+    }
+
     constexpr vec3& operator/=(float t) {
         return *this *= 1/t;
     }
@@ -43,6 +50,11 @@ class vec3 {
 
     constexpr float length_squared() const {
         return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
+    }
+
+    bool near_zero() const {
+        auto s = 1e-8;
+        return (std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) < s);
     }
 
     static vec3 random() {
@@ -132,4 +144,8 @@ inline vec3 random_on_hemisphere(const vec3& normal) {
         return on_unit_sphere;
     else
         return -on_unit_sphere;
+}
+
+inline vec3 reflect(const vec3& v, const vec3& n) {
+    return v - 2*dot(v,n)*n;
 }
