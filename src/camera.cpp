@@ -1,22 +1,51 @@
 #include "camera.h"
 #include "material.h"
+#include <vector>
+#include <thread>
+#include <atomic>
 
 void camera::render(const hittable& world) {
     initialize();
 
-    std::ofstream out("image.ppm", std::ios::out | std::ios::binary);
-    // P6: raw bytes
-    out << "P6\n" << image_width << " " << image_height << "\n255\n";   
+    std::vector<color> image_buffer(image_width * image_height); // all in RAM
+    int num_threads = std::thread::hardware_concurrency();
+    if (num_threads == 0) num_threads = 4; // basically all modern pc's have >4 cores
+    std::vector<std::jthread> threads;
 
-    for (int j = 0; j < image_height; j++) {
-        for (int i = 0; i < image_width; i++) {
-            color pixel_color(0.0f,0.0f,0.0f);
-            for (int sample = 0; sample < samples_per_pixel; sample++) {
-                ray r = get_ray(i, j);
-                pixel_color += ray_color(r, max_depth, world);
+    // the the rendering in a lambda function to give it to each thread
+    // so multiple rows of pixels can be rendered at the same time:
+    std::atomic<int> next_row{0};
+    auto render_rows = [&]() {
+        int j;
+        // a thread asks for a (next) row to renders, does so, then asks for next,...
+        while ((j = next_row.fetch_add(1)) < image_height) {
+            for (int i = 0; i < image_width; i++) {
+                color pixel_color(0.0f,0.0f,0.0f);
+                for (int sample = 0; sample < samples_per_pixel; sample++) {
+                    ray r = get_ray(i, j);
+                    pixel_color += ray_color(r, max_depth, world);
+                }
+                // the index of the pixel in the 1D vector that represents the image
+                int pixel_index = j * image_width + i;
+                // no mutex needed: each thread only modifies it's 'own index' in the array
+                image_buffer[pixel_index] = pixel_samples_scale * pixel_color;
             }
-            write_color(out, pixel_samples_scale * pixel_color);
         }
+    };
+
+    int rows_per_thread = image_height / num_threads;
+    for (int t = 0; t < num_threads; t++) {
+        threads.emplace_back(render_rows);
+    }
+
+    // Clearing the vector will call .join() on each of the threads: wait until all done
+    threads.clear(); 
+
+    std::ofstream out("image.ppm", std::ios::out | std::ios::binary);
+    out << "P6\n" << image_width << " " << image_height << "\n255\n"; // P6: raw bytes
+
+    for (const auto& pixel : image_buffer) {
+        write_color(out, pixel);
     }
 }
 
