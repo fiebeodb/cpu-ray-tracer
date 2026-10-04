@@ -96,7 +96,7 @@ class dielectric : public material {
     }
 
   private:
-    // Refractive index in vacuum/air
+    // relative: refraction_index = (index of this object)/(index of surrounding material)
     float refraction_index;
 
     static float reflectance(float cosine, float refraction_index) {
