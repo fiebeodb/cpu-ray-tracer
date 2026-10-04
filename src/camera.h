@@ -12,6 +12,10 @@ class camera {
     int image_width  = 100;  // Rendered image width in pixel count
     int samples_per_pixel = 10;
     int max_depth = 10; // Max number of ray bounces in scene -> make it lower for games!
+    float vfov = 90; // vertical FOV
+    point3 lookfrom = point3(0.0f,0.0f,0.0f); // Point camera is looking from
+    point3 lookat = point3(0.0f,0.0f,-1.0f); // Point camera is looking at
+    vec3 vup = vec3(0.0f,1.0f,0.0f); // up vector
 
     void render(const hittable& world);
 
@@ -22,6 +26,7 @@ class camera {
     point3 pixel00_loc; // Location of pixel 0, 0
     vec3 pixel_delta_u; // Offset/distance to pixel to the right
     vec3 pixel_delta_v; // Offset/distance to pixel below
+    vec3 u, v, w;
 
     void initialize();
 
