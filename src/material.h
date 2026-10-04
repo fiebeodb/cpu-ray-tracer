@@ -59,3 +59,28 @@ class metal : public material {
     color albedo;
     float fuzz;
 };
+
+// dielectric material that always refract when possible
+class dielectric : public material {
+  public:
+    dielectric(float refraction_index) : refraction_index{refraction_index} {}
+
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
+    const override {
+        // no light gets absorbed: light either reflects (completely) or refracts
+        // so the attenuation is just be 1 across all channels (no albedo)
+        attenuation = color(1.0f, 1.0f, 1.0f);
+        // coming from or going into vacuum
+        float ri = rec.front_face ? (1.0f/refraction_index) : refraction_index;
+
+        vec3 unit_direction = unit_vector(r_in.direction());
+        vec3 refracted = refract(unit_direction, rec.normal, ri);
+
+        scattered = ray(rec.p, refracted);
+        return true;
+    }
+
+  private:
+    // Refractive index in vacuum/air
+    float refraction_index;
+};

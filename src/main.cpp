@@ -10,8 +10,8 @@ int main() {
 
     auto material_ground = std::make_shared<lambertian>(color(0.8f, 0.8f, 0.0f));
     auto material_center = std::make_shared<lambertian>(color(0.1f, 0.2f, 0.5f));
-    auto material_left = std::make_shared<metal>(color(0.8f, 0.8f, 0.8f), 0.0f);
-    auto material_right = std::make_shared<metal>(color(0.9f, 0.9f, 0.9f), 0.4f);
+    auto material_left = std::make_shared<metal>(color(0.99f, 0.78f, 0.34f), 0.05f);
+    auto material_right = std::make_shared<metal>(color(0.97f, 0.96f, 0.95f), 0.6f);
 
     world.add(std::make_shared<sphere>(point3(0.0f, -100.5f, -1.0f), 100.0f, material_ground));
     world.add(std::make_shared<sphere>(point3(0.0f, 0.0f, -1.2f), 0.5f, material_center));

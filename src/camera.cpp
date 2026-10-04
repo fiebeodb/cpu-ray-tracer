@@ -17,7 +17,7 @@ void camera::render(const hittable& world) {
     std::atomic<int> next_row{0};
     auto render_rows = [&]() {
         int j;
-        // a thread asks for a (next) row to renders, does so, then asks for next,...
+        // a thread asks for a (next) row to renders, does so, then asks for next,... 
         while ((j = next_row.fetch_add(1)) < image_height) {
             for (int i = 0; i < image_width; i++) {
                 color pixel_color(0.0f,0.0f,0.0f);
@@ -33,7 +33,6 @@ void camera::render(const hittable& world) {
         }
     };
 
-    int rows_per_thread = image_height / num_threads;
     for (int t = 0; t < num_threads; t++) {
         threads.emplace_back(render_rows);
     }
