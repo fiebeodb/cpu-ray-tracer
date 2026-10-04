@@ -60,7 +60,7 @@ class metal : public material {
     float fuzz;
 };
 
-// dielectric material that always refract when possible
+// dielectric material that always refracts when possible
 class dielectric : public material {
   public:
     dielectric(float refraction_index) : refraction_index{refraction_index} {}
@@ -74,9 +74,20 @@ class dielectric : public material {
         float ri = rec.front_face ? (1.0f/refraction_index) : refraction_index;
 
         vec3 unit_direction = unit_vector(r_in.direction());
-        vec3 refracted = refract(unit_direction, rec.normal, ri);
+        double cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0);
+        double sin_theta = std::sqrt(1.0 - cos_theta*cos_theta);
 
-        scattered = ray(rec.p, refracted);
+        // when going from high to low refractive index, a too high angle might result
+        // in the light not being able to refract: total internal reflection instead
+        bool cannot_refract = ri * sin_theta > 1.0;
+        vec3 direction;
+
+        if (cannot_refract)
+            direction = reflect(unit_direction, rec.normal);
+        else
+            direction = refract(unit_direction, rec.normal, ri);
+
+        scattered = ray(rec.p, direction);
         return true;
     }
 
