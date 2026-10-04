@@ -74,15 +74,19 @@ class dielectric : public material {
         float ri = rec.front_face ? (1.0f/refraction_index) : refraction_index;
 
         vec3 unit_direction = unit_vector(r_in.direction());
-        double cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0);
-        double sin_theta = std::sqrt(1.0 - cos_theta*cos_theta);
+        float cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0f);
+        float sin_theta = std::sqrt(1.0f - cos_theta*cos_theta);
 
         // when going from high to low refractive index, a too high angle might result
         // in the light not being able to refract: total internal reflection instead
-        bool cannot_refract = ri * sin_theta > 1.0;
+        bool cannot_refract = ri * sin_theta > 1.0f;
         vec3 direction;
 
-        if (cannot_refract)
+        // i could also send both a refracted and reflected ray and mix the results
+        // together in a final color, but this is 2x as much work as just letting every
+        // ray choose either refract or reflect in weighted random choice
+        // if every ray does this, then *all together* it will look basically the same
+        if (cannot_refract || reflectance(cos_theta, ri) > random_float())
             direction = reflect(unit_direction, rec.normal);
         else
             direction = refract(unit_direction, rec.normal, ri);
@@ -94,4 +98,11 @@ class dielectric : public material {
   private:
     // Refractive index in vacuum/air
     float refraction_index;
+
+    static float reflectance(float cosine, float refraction_index) {
+        // Schlick's approximation for reflectance
+        auto r0 = (1.0f - refraction_index) / (1.0f + refraction_index);
+        r0 = r0*r0;
+        return r0 + (1.0f-r0)*std::pow((1.0f - cosine), 5.0f);
+    }
 };
