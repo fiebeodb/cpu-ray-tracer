@@ -63,13 +63,14 @@ class metal : public material {
 // dielectric material that always refracts when possible
 class dielectric : public material {
   public:
-    dielectric(float refraction_index) : refraction_index{refraction_index} {}
+    dielectric(float refraction_index, const color& albedo = color(1.0, 1.0, 1.0)) 
+      : refraction_index{refraction_index}, albedo{albedo} {}
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
     const override {
         // no light gets absorbed: light either reflects (completely) or refracts
         // so the attenuation is just be 1 across all channels (no albedo)
-        attenuation = color(1.0f, 1.0f, 1.0f);
+        attenuation = albedo;
         // coming from or going into vacuum
         float ri = rec.front_face ? (1.0f/refraction_index) : refraction_index;
 
@@ -98,6 +99,7 @@ class dielectric : public material {
   private:
     // relative: refraction_index = (index of this object)/(index of surrounding material)
     float refraction_index;
+    color albedo;
 
     static float reflectance(float cosine, float refraction_index) {
         // Schlick's approximation for reflectance
