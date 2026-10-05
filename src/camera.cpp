@@ -56,10 +56,9 @@ void camera::initialize() {
     center = lookfrom;
 
     // Determine viewport dimensions
-    auto focal_length = (lookfrom - lookat).length();
     auto theta = degrees_to_radians(vfov);
     auto h = std::tan(theta/2.0f);
-    auto viewport_height = 2.0f * h * focal_length;
+    auto viewport_height = 2.0f * h * focus_dist;
     float viewport_width = viewport_height * (static_cast<float>(image_width) / static_cast<float>(image_height));
 
     w = unit_vector(lookfrom - lookat);
@@ -75,17 +74,24 @@ void camera::initialize() {
     pixel_delta_v = viewport_v / static_cast<float>(image_height);
 
     // Calculate the location of the upper left pixel
-    auto viewport_upper_left = center - (focal_length * w) - viewport_u/2 - viewport_v/2;
+    auto viewport_upper_left = center - (focus_dist * w) - viewport_u/2 - viewport_v/2;
     pixel00_loc = viewport_upper_left + 0.5f * (pixel_delta_u + pixel_delta_v);
+
+    // Calculate the camera defocus disk basis vectors.
+    auto defocus_radius = focus_dist * std::tan(degrees_to_radians(defocus_angle / 2.0f));
+    defocus_disk_u = u * defocus_radius;
+    defocus_disk_v = v * defocus_radius;
 }
 
+// Construct a camera ray originating from random point on the defocus disk 
+// and directed at a randomly sampled point around the pixel location i, j
 ray camera::get_ray(int i, int j) const {
     auto offset = sample_square();
     auto pixel_sample = pixel00_loc
                       + ((i + offset.x()) * pixel_delta_u)
                       + ((j + offset.y()) * pixel_delta_v);
 
-    auto ray_origin = center;
+    auto ray_origin = (defocus_angle <= 0.0f) ? center : defocus_disk_sample();
     auto ray_direction = pixel_sample - ray_origin;
 
     return ray(ray_origin, ray_direction);
@@ -93,6 +99,11 @@ ray camera::get_ray(int i, int j) const {
 
 vec3 camera::sample_square() const {
     return vec3(random_float() - 0.5f, random_float() - 0.5f, 0.0f);
+}
+
+point3 camera::defocus_disk_sample() const {
+    auto p = random_in_unit_disk();
+    return center + (p[0] * defocus_disk_u) + (p[1] * defocus_disk_v);
 }
 
 color camera::ray_color(const ray& r, int depth, const hittable& world) const {

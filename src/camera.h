@@ -16,6 +16,8 @@ class camera {
     point3 lookfrom = point3(0.0f,0.0f,0.0f); // Point camera is looking from
     point3 lookat = point3(0.0f,0.0f,-1.0f); // Point camera is looking at
     vec3 vup = vec3(0.0f,1.0f,0.0f); // up vector
+    float defocus_angle = 0.0f; // Variation angle of rays through each pixel: decides blur strength
+    float focus_dist = 10.0f; // Distance from camera lookfrom point to plane of perfect focus
 
     void render(const hittable& world);
 
@@ -27,6 +29,8 @@ class camera {
     vec3 pixel_delta_u; // Offset/distance to pixel to the right
     vec3 pixel_delta_v; // Offset/distance to pixel below
     vec3 u, v, w;
+    vec3 defocus_disk_u; // Defocus disk horizontal radius
+    vec3 defocus_disk_v; // Defocus disk vertical radius
 
     void initialize();
 
@@ -39,6 +43,11 @@ class camera {
      * @return the constructed ray
      */
     ray get_ray(int i, int j) const;
+
+    /**
+     * @return a random point in the camera defocus disk. 
+     */
+    point3 defocus_disk_sample() const;
 
     /**
      * @return a random position within a 1x1 square

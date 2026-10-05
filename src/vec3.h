@@ -115,6 +115,14 @@ constexpr inline vec3 unit_vector(const vec3& v) {
     return v / v.length();
 }
 
+inline vec3 random_in_unit_disk() {
+    while (true) {
+        auto p = vec3(random_float(-1.0f,1.0f), random_float(-1.0f,1.0f), 0.0f);
+        if (p.length_squared() < 1)
+            return p;
+    }
+}
+
 /**
  * Generates random vectors within a 2x2 unit square, until we find one that
  * falls within the unit 1 circle in this square, then return it normalized.
